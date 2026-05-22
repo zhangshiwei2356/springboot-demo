@@ -24,7 +24,7 @@ import java.util.Map;
 @Service
 public class ProductReadServiceImpl extends BaseService<ProductPriceQueryDTO, ProductPriceVO> implements ProductReadService {
 
-    // price
+    // price map
     private static final Map<String, BigDecimal> DEMO_PRICE = new HashMap<>();
 
     static {
