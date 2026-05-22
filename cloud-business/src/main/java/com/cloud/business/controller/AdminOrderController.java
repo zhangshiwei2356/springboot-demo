@@ -23,7 +23,7 @@ import java.util.List;
 @Validated
 @RestController
 @RequestMapping("/api/admin/orders")
-@Tag(name = "管理中心订单", description = "与真实下单 API /api/orders 独立")
+@Tag(name = "管理中心订单", description = "与真实下单 API /api/orders 独立 ")
 public class AdminOrderController extends BaseController<AdminOrderSaveDTO, AdminOrderVO> {
 
     private final AdminOrderService adminOrderService;
