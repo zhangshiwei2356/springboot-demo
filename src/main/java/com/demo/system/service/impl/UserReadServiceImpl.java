@@ -1,0 +1,66 @@
+package com.demo.system.service.impl;
+
+import com.demo.common.base.BaseService;
+import com.demo.common.domain.PageResult;
+import com.demo.common.exception.GlobalException;
+import com.demo.system.dto.UserQueryDTO;
+import com.demo.system.service.UserReadService;
+import com.demo.system.vo.UserVO;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 演示内存用户表。
+ */
+@Service
+public class UserReadServiceImpl extends BaseService<UserQueryDTO, UserVO> implements UserReadService {
+
+    private static final Map<Long, UserVO> DEMO_USERS = new HashMap<>();
+
+    static {
+        DEMO_USERS.put(1L, new UserVO(1L, "演示用户一号", "超级管理员", "/img/avatar-1.svg"));
+        DEMO_USERS.put(2L, new UserVO(2L, "演示用户二号", "运营专员", "/img/avatar-2.svg"));
+        DEMO_USERS.put(10086L, new UserVO(10086L, "演示用户10086", "普通用户", "/img/avatar-3.svg"));
+    }
+
+    @Override
+    public UserVO getByUserId(Long userId) {
+        if (userId == null) {
+            throw new GlobalException("用户不存在");
+        }
+        UserVO u = DEMO_USERS.get(userId);
+        if (u == null) {
+            throw new GlobalException("用户不存在");
+        }
+        return new UserVO(u.getUserId(), u.getUserName(), u.getRole(), u.getAvatarUrl());
+    }
+
+    @Override
+    public List<UserVO> list(UserQueryDTO dto) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public PageResult<UserVO> page(UserQueryDTO dto) {
+        return new PageResult<>(1, 10, 0, Collections.emptyList());
+    }
+
+    @Override
+    public Boolean save(UserQueryDTO dto) {
+        return Boolean.FALSE;
+    }
+
+    @Override
+    public Boolean update(UserQueryDTO dto) {
+        return Boolean.FALSE;
+    }
+
+    @Override
+    public Boolean delete(Long id) {
+        return Boolean.FALSE;
+    }
+}
