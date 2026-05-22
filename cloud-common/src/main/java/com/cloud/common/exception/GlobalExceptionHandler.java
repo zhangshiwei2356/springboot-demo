@@ -2,7 +2,6 @@ package com.cloud.common.exception;
 
 import com.cloud.common.domain.Result;
 import com.cloud.common.enums.ResultCode;
-import feign.FeignException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.stream.Collectors;
 
 /**
- * 全局异常统一拦截：业务异常 / 校验 / Feign / 未知异常。
+ * 全局异常统一拦截：业务异常 / 校验 / 未知异常。
  */
 @RestControllerAdvice
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
@@ -59,13 +58,6 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("; "));
         LOGGER.warn("constraint violation {}", msg);
         return Result.fail(ResultCode.BAD_REQUEST.getCode(), msg);
-    }
-
-    @ExceptionHandler(FeignException.class)
-    @ResponseStatus(HttpStatus.BAD_GATEWAY)
-    public Result<Void> handleFeign(FeignException ex) {
-        LOGGER.error("feign remote error status={} body={}", ex.status(), ex.contentUTF8(), ex);
-        return Result.fail(ResultCode.REMOTE_CALL_ERROR.getCode(), "下游服务不可用或返回异常");
     }
 
     @ExceptionHandler(Throwable.class)

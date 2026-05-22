@@ -5,18 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.cloud</groupId>
-    <artifactId>spring-cloud-demo</artifactId>
+    <artifactId>springboot-demo</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>spring-cloud-demo</name>
-    <description>企业级 Spring Cloud 微服务脚手架（JDK21 / 无 Lombok / 无 MapStruct）</description>
+    <name>springboot-demo</name>
+    <description>企业级 Spring Boot 单机应用脚手架（JDK21 / 无 Lombok / 无 MapStruct）</description>
 
     <modules>
         <module>cloud-common</module>
-        <module>cloud-gateway</module>
         <module>cloud-auth</module>
         <module>cloud-system</module>
         <module>cloud-business</module>
+        <module>cloud-app</module>
     </modules>
 
     <properties>
@@ -25,10 +25,9 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>3.3.6</spring-boot.version>
-        <spring-cloud.version>2023.0.4</spring-cloud.version>
-        <spring-cloud-alibaba.version>2023.0.3.2</spring-cloud-alibaba.version>
         <jjwt.version>0.12.6</jjwt.version>
         <knife4j.version>4.5.0</knife4j.version>
+        <swagger-annotations.version>2.2.22</swagger-annotations.version>
         <groovy.version>4.0.24</groovy.version>
         <spock.version>2.4-M4-groovy-4.0</spock.version>
     </properties>
@@ -39,20 +38,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.cloud</groupId>
-                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -72,6 +57,11 @@
                 <version>${jjwt.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger-annotations.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
@@ -79,6 +69,21 @@
             <dependency>
                 <groupId>com.cloud</groupId>
                 <artifactId>cloud-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cloud</groupId>
+                <artifactId>cloud-auth</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cloud</groupId>
+                <artifactId>cloud-system</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cloud</groupId>
+                <artifactId>cloud-business</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

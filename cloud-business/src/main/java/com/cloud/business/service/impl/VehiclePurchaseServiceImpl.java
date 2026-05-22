@@ -4,8 +4,8 @@ import com.cloud.business.dto.AdminOrderSaveDTO;
 import com.cloud.business.dto.SubmitOrderDTO;
 import com.cloud.business.dto.VehiclePurchaseDTO;
 import com.cloud.business.entity.VehicleEntity;
-import com.cloud.business.feign.SystemUserFeignClient;
-import com.cloud.business.feign.dto.UserRemoteVO;
+import com.cloud.business.integration.SystemUserClient;
+import com.cloud.business.integration.dto.UserRemoteVO;
 import com.cloud.business.mapper.VehicleMapper;
 import com.cloud.business.service.AdminOrderService;
 import com.cloud.business.service.OrderService;
@@ -33,18 +33,18 @@ public class VehiclePurchaseServiceImpl implements VehiclePurchaseService {
     private final VehicleMapper vehicleMapper;
     private final OrderService orderService;
     private final AdminOrderService adminOrderService;
-    private final SystemUserFeignClient systemUserFeignClient;
+    private final SystemUserClient systemUserClient;
 
     public VehiclePurchaseServiceImpl(VehicleService vehicleService,
                                       VehicleMapper vehicleMapper,
                                       OrderService orderService,
                                       AdminOrderService adminOrderService,
-                                      SystemUserFeignClient systemUserFeignClient) {
+                                      SystemUserClient systemUserClient) {
         this.vehicleService = vehicleService;
         this.vehicleMapper = vehicleMapper;
         this.orderService = orderService;
         this.adminOrderService = adminOrderService;
-        this.systemUserFeignClient = systemUserFeignClient;
+        this.systemUserClient = systemUserClient;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class VehiclePurchaseServiceImpl implements VehiclePurchaseService {
 
     private String resolveBuyerName(Long uid) {
         try {
-            Result<UserRemoteVO> userResp = systemUserFeignClient.getUser(uid);
+            Result<UserRemoteVO> userResp = systemUserClient.getUser(uid);
             if (userResp != null && userResp.getData() != null
                     && StringUtils.hasText(userResp.getData().getUserName())) {
                 return userResp.getData().getUserName();

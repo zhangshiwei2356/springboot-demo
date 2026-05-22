@@ -2,7 +2,7 @@ package com.cloud.business.converter;
 
 import com.cloud.business.dto.SubmitOrderDTO;
 import com.cloud.business.entity.OrderEntity;
-import com.cloud.business.feign.dto.ProductRemoteVO;
+import com.cloud.business.integration.dto.ProductRemoteVO;
 import com.cloud.business.vo.OrderVO;
 import com.cloud.common.base.BaseConverter;
 import com.cloud.common.util.DateUtils;

@@ -1,7 +1,7 @@
 package com.cloud.business.vo;
 
-import com.cloud.business.feign.dto.ProductRemoteVO;
-import com.cloud.business.feign.dto.UserRemoteVO;
+import com.cloud.business.integration.dto.ProductRemoteVO;
+import com.cloud.business.integration.dto.UserRemoteVO;
 
 import java.io.Serializable;
 

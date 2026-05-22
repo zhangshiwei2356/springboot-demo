@@ -1,10 +1,10 @@
 package com.cloud.business.handler
 
 import com.cloud.business.dto.SubmitOrderDTO
-import com.cloud.business.feign.SystemProductFeignClient
-import com.cloud.business.feign.SystemUserFeignClient
-import com.cloud.business.feign.dto.ProductRemoteVO
-import com.cloud.business.feign.dto.UserRemoteVO
+import com.cloud.business.integration.SystemProductClient
+import com.cloud.business.integration.SystemUserClient
+import com.cloud.business.integration.dto.ProductRemoteVO
+import com.cloud.business.integration.dto.UserRemoteVO
 import com.cloud.common.domain.Result
 import com.cloud.common.enums.ResultCode
 import spock.lang.Specification
@@ -31,14 +31,14 @@ class OrderHandlerSpec extends Specification {
         prodResult.setMessage(ResultCode.SUCCESS.getMessage())
         prodResult.setData(p)
 
-        SystemUserFeignClient userFeignClient = Stub() {
+        SystemUserClient userClient = Stub() {
             getUser(1L) >> userResult
         }
-        SystemProductFeignClient productFeignClient = Stub() {
+        SystemProductClient productClient = Stub() {
             getPrice("SKU-DEMO") >> prodResult
         }
 
-        def handler = new OrderHandler(userFeignClient, productFeignClient)
+        def handler = new OrderHandler(userClient, productClient)
 
         def dto = new SubmitOrderDTO()
         dto.buyerUserId = 1L

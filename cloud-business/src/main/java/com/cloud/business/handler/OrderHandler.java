@@ -1,10 +1,10 @@
 package com.cloud.business.handler;
 
 import com.cloud.business.dto.SubmitOrderDTO;
-import com.cloud.business.feign.SystemProductFeignClient;
-import com.cloud.business.feign.SystemUserFeignClient;
-import com.cloud.business.feign.dto.ProductRemoteVO;
-import com.cloud.business.feign.dto.UserRemoteVO;
+import com.cloud.business.integration.SystemProductClient;
+import com.cloud.business.integration.SystemUserClient;
+import com.cloud.business.integration.dto.ProductRemoteVO;
+import com.cloud.business.integration.dto.UserRemoteVO;
 import com.cloud.business.vo.OrderIntegrationResult;
 import com.cloud.common.base.BaseHandler;
 import com.cloud.common.domain.Result;
@@ -18,13 +18,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrderHandler extends BaseHandler<SubmitOrderDTO, OrderIntegrationResult> {
 
-    private final SystemUserFeignClient systemUserFeignClient;
-    private final SystemProductFeignClient systemProductFeignClient;
+    private final SystemUserClient systemUserClient;
+    private final SystemProductClient systemProductClient;
 
-    public OrderHandler(SystemUserFeignClient systemUserFeignClient,
-                        SystemProductFeignClient systemProductFeignClient) {
-        this.systemUserFeignClient = systemUserFeignClient;
-        this.systemProductFeignClient = systemProductFeignClient;
+    public OrderHandler(SystemUserClient systemUserClient,
+                        SystemProductClient systemProductClient) {
+        this.systemUserClient = systemUserClient;
+        this.systemProductClient = systemProductClient;
     }
 
     @Override
@@ -32,12 +32,12 @@ public class OrderHandler extends BaseHandler<SubmitOrderDTO, OrderIntegrationRe
         beforeRemote(request);
         OrderIntegrationResult result = new OrderIntegrationResult();
 
-        Result<UserRemoteVO> userResp = systemUserFeignClient.getUser(request.getBuyerUserId());
+        Result<UserRemoteVO> userResp = systemUserClient.getUser(request.getBuyerUserId());
         UserRemoteVO user = unwrap(userResp, "查询用户失败");
         result.setUser(user);
 
         Result<ProductRemoteVO> priceResp =
-                systemProductFeignClient.getPrice(request.getProductCode().trim());
+                systemProductClient.getPrice(request.getProductCode().trim());
         ProductRemoteVO product = unwrap(priceResp, "查询商品价格失败");
         if (!product.getProductCode().equalsIgnoreCase(request.getProductCode().trim())) {
             product.setProductCode(request.getProductCode().trim());

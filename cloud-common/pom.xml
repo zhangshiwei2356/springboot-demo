@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.cloud</groupId>
-        <artifactId>spring-cloud-demo</artifactId>
+        <artifactId>springboot-demo</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>cloud-common</artifactId>
@@ -41,13 +41,13 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>io.github.openfeign</groupId>
-            <artifactId>feign-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

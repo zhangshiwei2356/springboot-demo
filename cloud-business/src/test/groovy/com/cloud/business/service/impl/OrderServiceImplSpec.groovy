@@ -2,8 +2,8 @@ package com.cloud.business.service.impl
 
 import com.cloud.business.converter.OrderConverter
 import com.cloud.business.dto.SubmitOrderDTO
-import com.cloud.business.feign.dto.ProductRemoteVO
-import com.cloud.business.feign.dto.UserRemoteVO
+import com.cloud.business.integration.dto.ProductRemoteVO
+import com.cloud.business.integration.dto.UserRemoteVO
 import com.cloud.business.handler.OrderHandler
 import com.cloud.business.persistence.OrderPersistence
 import com.cloud.business.service.OrderAsyncNotifyService
