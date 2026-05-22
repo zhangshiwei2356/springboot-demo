@@ -34,9 +34,11 @@ const VehiclePurchase = (function () {
         return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    function vehicleIcon(brand) {
-        const b = (brand || '').slice(0, 1);
-        return b || '🚗';
+    function brandLogo(brand) {
+        if (typeof VehicleBrandLogo !== 'undefined') {
+            return VehicleBrandLogo.render(brand);
+        }
+        return '<span class="vp-brand-logo-fallback">' + escapeHtml((brand || '?').slice(0, 1)) + '</span>';
     }
 
     function setView(view, extra) {
@@ -108,7 +110,7 @@ const VehiclePurchase = (function () {
             let html = '';
             list.forEach(function (v) {
                 html += '<article class="vp-card card" data-id="' + v.id + '">' +
-                    '<div class="vp-card-icon">' + escapeHtml(vehicleIcon(v.brand)) + '</div>' +
+                    '<div class="vp-card-icon">' + brandLogo(v.brand) + '</div>' +
                     '<div class="vp-card-body">' +
                     '<h3>' + escapeHtml(v.name) + '</h3>' +
                     '<p class="vp-meta">' + escapeHtml(v.brand) + ' · ' + escapeHtml(v.model) + '</p>' +
@@ -138,16 +140,16 @@ const VehiclePurchase = (function () {
                 '<button type="button" class="btn-link" id="vpBackList">← 返回列表</button></div>' +
                 '<div class="vp-detail card">' +
                 '<div class="vp-detail-head">' +
-                '<div class="vp-detail-icon">' + escapeHtml(vehicleIcon(v.brand)) + '</div>' +
+                '<div class="vp-detail-icon">' + brandLogo(v.brand) + '</div>' +
                 '<div><h2>' + escapeHtml(v.name) + '</h2>' +
                 '<p class="hint">SKU：' + escapeHtml(v.code) + '</p></div></div>' +
                 '<div class="vp-detail-grid">' +
-                detailRow('品牌', v.brand) +
-                detailRow('车型', v.model) +
-                detailRow('颜色', v.color) +
-                detailRow('能源', v.fuelType) +
-                detailRow('指导价', '¥ ' + formatMoney(v.price)) +
-                detailRow('库存', (v.stock != null ? v.stock + ' 台' : '-')) +
+                detailRowBrand(v.brand) +
+                detailRowText('车型', v.model) +
+                detailRowText('颜色', v.color) +
+                detailRowText('能源', v.fuelType) +
+                detailRowText('指导价', '¥ ' + formatMoney(v.price)) +
+                detailRowText('库存', (v.stock != null ? v.stock + ' 台' : '-')) +
                 '</div>' +
                 '<p class="vp-desc">' + escapeHtml(v.description || '暂无描述') + '</p>' +
                 '<div class="vp-actions">' +
@@ -168,9 +170,22 @@ const VehiclePurchase = (function () {
         }
     }
 
-    function detailRow(label, value) {
+    function detailRow(label, valueHtml) {
         return '<div class="vp-detail-item"><span class="label">' + escapeHtml(label) +
-            '</span><span class="value">' + escapeHtml(value || '-') + '</span></div>';
+            '</span><span class="value">' + valueHtml + '</span></div>';
+    }
+
+    function detailRowText(label, text) {
+        return detailRow(label, escapeHtml(text != null && text !== '' ? String(text) : '-'));
+    }
+
+    function detailRowBrand(brand) {
+        return '<div class="vp-detail-item vp-detail-item--brand">' +
+            '<span class="label">品牌</span>' +
+            '<span class="value vp-detail-brand">' +
+            '<span class="vp-detail-brand__logo" aria-hidden="true">' + brandLogo(brand) + '</span>' +
+            '<span class="vp-detail-brand__name">' + escapeHtml(brand || '-') + '</span>' +
+            '</span></div>';
     }
 
     async function renderCheckout() {
@@ -196,7 +211,10 @@ const VehiclePurchase = (function () {
             infoRow('姓名', profile.userName || sessionUser.userName) +
             infoRow('角色', profile.role || sessionUser.role) +
             '</div></div>' +
-            '<div class="card vp-panel"><h3>车辆信息</h3>' +
+            '<div class="card vp-panel vp-panel-vehicle"><h3>车辆信息</h3>' +
+            '<div class="vp-checkout-vehicle">' + brandLogo(v.brand) +
+            '<div class="vp-checkout-vehicle-text"><strong>' + escapeHtml(v.name) + '</strong>' +
+            '<p class="hint">' + escapeHtml(v.brand) + ' · ' + escapeHtml(v.model) + '</p></div></div>' +
             '<div class="vp-info-grid">' +
             infoRow('车辆', v.name) +
             infoRow('品牌/车型', (v.brand || '') + ' ' + (v.model || '')) +
@@ -365,7 +383,7 @@ const VehiclePurchase = (function () {
                 html += '<section class="card vp-order-section vp-vehicle-section">' +
                     '<h3 class="vp-section-title"><span class="vp-section-icon" aria-hidden="true">🚗</span>关联车辆</h3>' +
                     '<div class="vp-vehicle-summary">' +
-                    '<div class="vp-vehicle-summary-icon">' + escapeHtml(vehicleIcon(v.brand)) + '</div>' +
+                    '<div class="vp-vehicle-summary-icon">' + brandLogo(v.brand) + '</div>' +
                     '<div class="vp-vehicle-summary-body">' +
                     '<h4>' + escapeHtml(v.name) + '</h4>' +
                     '<p>' + escapeHtml(v.brand) + ' · ' + escapeHtml(v.model) + '</p>' +

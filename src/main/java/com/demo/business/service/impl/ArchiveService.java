@@ -4,6 +4,8 @@ import com.demo.business.config.ArchiveProperties;
 import com.demo.business.dto.ArchiveRequest;
 import com.demo.business.entity.ArchiveRecord;
 import com.demo.business.persistence.archive.ArchiveMetaStore;
+import com.demo.business.support.ArchiveDownloadPackage;
+import com.demo.business.support.ArchiveExcelExporter;
 import com.demo.common.exception.GlobalException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -20,6 +24,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class ArchiveService {
@@ -115,6 +121,38 @@ public class ArchiveService {
         return new FileSystemResource(path);
     }
 
+    /**
+     * 打包下载：档案信息 Excel + 附件（若有）合并为一个 ZIP。
+     */
+    public ArchiveDownloadPackage buildDownloadPackage(Long id) throws IOException {
+        ArchiveRecord record = metaStore.findById(id).orElseThrow(() -> new GlobalException("档案不存在"));
+        byte[] excelBytes = ArchiveExcelExporter.toExcelBytes(record);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ZipOutputStream zos = new ZipOutputStream(baos)) {
+            ZipEntry excelEntry = new ZipEntry("档案信息.xlsx");
+            zos.putNextEntry(excelEntry);
+            zos.write(excelBytes);
+            zos.closeEntry();
+
+            if (StringUtils.hasText(record.getStoredFileName())) {
+                Path attachmentPath = filePath(id, record.getStoredFileName());
+                if (Files.exists(attachmentPath)) {
+                    String attachmentName = sanitizeZipEntryName(
+                            record.getOriginalFileName() != null ? record.getOriginalFileName() : record.getStoredFileName());
+                    ZipEntry fileEntry = new ZipEntry("附件/" + attachmentName);
+                    zos.putNextEntry(fileEntry);
+                    try (InputStream in = Files.newInputStream(attachmentPath)) {
+                        in.transferTo(zos);
+                    }
+                    zos.closeEntry();
+                }
+            }
+            zos.finish();
+            String zipName = "archive-" + id + "-" + sanitizeZipEntryName(record.getTitle()) + ".zip";
+            return new ArchiveDownloadPackage(baos.toByteArray(), zipName);
+        }
+    }
+
     public String rootDirPath() {
         return rootDir.toString();
     }
@@ -189,5 +227,16 @@ public class ArchiveService {
             return "application/pdf";
         }
         return "application/octet-stream";
+    }
+
+    private static String sanitizeZipEntryName(String name) {
+        if (!StringUtils.hasText(name)) {
+            return "file";
+        }
+        String sanitized = name.replace("\\", "_").replace("/", "_").trim();
+        if (sanitized.isEmpty()) {
+            return "file";
+        }
+        return sanitized;
     }
 }

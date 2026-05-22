@@ -3,7 +3,9 @@ package com.demo.business.controller;
 import com.demo.business.dto.ArchiveRequest;
 import com.demo.business.entity.ArchiveRecord;
 import com.demo.business.service.impl.ArchiveService;
+import com.demo.business.support.ArchiveDownloadPackage;
 import com.demo.common.domain.Result;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -75,7 +77,8 @@ public class ArchiveController {
     }
 
     @GetMapping("/{id}/file")
-    public ResponseEntity<Resource> download(@PathVariable Long id) throws Exception {
+    @Operation(summary = "下载附件（预览用）")
+    public ResponseEntity<Resource> downloadAttachment(@PathVariable Long id) throws Exception {
         ArchiveRecord record = archiveService.get(id);
         Resource resource = archiveService.loadFileResource(id);
         String filename = record.getOriginalFileName() != null ? record.getOriginalFileName() : "download";
@@ -89,5 +92,18 @@ public class ArchiveController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
+    }
+
+    @GetMapping("/{id}/download")
+    @Operation(summary = "打包下载（档案信息 Excel + 附件 ZIP）")
+    public ResponseEntity<byte[]> downloadPackage(@PathVariable Long id) throws Exception {
+        ArchiveDownloadPackage pkg = archiveService.buildDownloadPackage(id);
+        ContentDisposition disposition = ContentDisposition.attachment()
+                .filename(pkg.getFilename(), StandardCharsets.UTF_8)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                .contentType(MediaType.parseMediaType("application/zip"))
+                .body(pkg.getContent());
     }
 }

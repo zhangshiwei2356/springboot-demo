@@ -22,6 +22,7 @@
         <swagger-annotations.version>2.2.22</swagger-annotations.version>
         <groovy.version>4.0.24</groovy.version>
         <spock.version>2.4-M4-groovy-4.0</spock.version>
+        <poi.version>5.2.5</poi.version>
     </properties>
 
     <dependencyManagement>
@@ -134,6 +135,11 @@
             <groupId>org.spockframework</groupId>
             <artifactId>spock-spring</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

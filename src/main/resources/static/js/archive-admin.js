@@ -150,13 +150,11 @@ const ArchiveAdmin = (function () {
                         '<td>' + escapeHtml(r.updateTime || '-') + '</td>' +
                         '<td class="actions">' +
                         '<button type="button" class="btn-link" data-edit="' + r.id + '">编辑</button>' +
-                        '<button type="button" class="btn-link" data-upload="' + r.id + '">上传</button>';
-                    if (r.storedFileName) {
-                        html += '<button type="button" class="btn-link" data-dl="' + r.id + '" data-filename="' +
-                            escapeAttr(r.originalFileName || '') + '">下载</button>';
-                        if (r.fileType === 'IMAGE') {
+                        '<button type="button" class="btn-link" data-upload="' + r.id + '">上传</button>' +
+                        '<button type="button" class="btn-link" data-dl="' + r.id + '" data-title="' +
+                            escapeAttr(r.title || '') + '">下载</button>';
+                    if (r.storedFileName && r.fileType === 'IMAGE') {
                             html += '<button type="button" class="btn-link" data-preview="' + r.id + '">预览</button>';
-                        }
                     }
                     html += '<button type="button" class="btn-link danger" data-del="' + r.id + '">删除</button>' +
                         '</td></tr>';
@@ -182,7 +180,7 @@ const ArchiveAdmin = (function () {
                     e.preventDefault();
                     downloadFile(
                         Number(dlBtn.getAttribute('data-dl')),
-                        dlBtn.getAttribute('data-filename') || ''
+                        dlBtn.getAttribute('data-title') || ''
                     ).catch(showError);
                     return;
                 }
@@ -247,16 +245,16 @@ const ArchiveAdmin = (function () {
                 openModal('上传文件', true);
             }
 
-            async function downloadFile(id, preferredName) {
-                const res = await fetch(API + '/' + id + '/file', { headers: authHeaders() });
+            async function downloadFile(id, title) {
+                const res = await fetch(API + '/' + id + '/download', { headers: authHeaders() });
                 if (!res.ok) {
                     throw new Error('下载失败 HTTP ' + res.status);
                 }
                 const blob = await res.blob();
                 const disp = res.headers.get('Content-Disposition') || '';
-                let name = (preferredName && preferredName.trim())
-                    || parseFilenameFromDisposition(disp)
-                    || 'download';
+                let name = parseFilenameFromDisposition(disp)
+                    || ('archive-' + id + (title ? '-' + title : '') + '.zip');
+                name = name.replace(/[\\/:*?"<>|]/g, '_');
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;

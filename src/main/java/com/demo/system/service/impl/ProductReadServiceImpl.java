@@ -1,5 +1,7 @@
 package com.demo.system.service.impl;
 
+import com.demo.business.entity.VehicleEntity;
+import com.demo.business.mapper.VehicleMapper;
 import com.demo.common.base.BaseService;
 import com.demo.common.domain.PageResult;
 import com.demo.common.exception.GlobalException;
@@ -7,11 +9,13 @@ import com.demo.system.dto.ProductPriceQueryDTO;
 import com.demo.system.service.ProductReadService;
 import com.demo.system.vo.ProductPriceVO;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -26,11 +30,12 @@ public class ProductReadServiceImpl extends BaseService<ProductPriceQueryDTO, Pr
         DEMO_PRICE.put("SKU-PHONE", new BigDecimal("3999.00"));
         DEMO_PRICE.put("SKU-BOOK", new BigDecimal("59.90"));
         DEMO_PRICE.put("SKU-DEMO", new BigDecimal("9.99"));
-        DEMO_PRICE.put("CAR-001", new BigDecimal("259900.00"));
-        DEMO_PRICE.put("CAR-002", new BigDecimal("189800.00"));
-        DEMO_PRICE.put("CAR-003", new BigDecimal("328000.00"));
-        DEMO_PRICE.put("CAR-004", new BigDecimal("156800.00"));
-        DEMO_PRICE.put("CAR-005", new BigDecimal("219900.00"));
+    }
+
+    private final VehicleMapper vehicleMapper;
+
+    public ProductReadServiceImpl(VehicleMapper vehicleMapper) {
+        this.vehicleMapper = vehicleMapper;
     }
 
     @Override
@@ -38,14 +43,29 @@ public class ProductReadServiceImpl extends BaseService<ProductPriceQueryDTO, Pr
         if (dto == null || dto.getProductCode() == null) {
             throw new GlobalException("商品编码不能为空");
         }
-        BigDecimal price = DEMO_PRICE.get(dto.getProductCode().trim());
+        String code = dto.getProductCode().trim();
+        BigDecimal price = DEMO_PRICE.get(code);
+        if (price == null && code.toUpperCase(Locale.ROOT).startsWith("CAR-")) {
+            price = lookupVehiclePrice(code);
+        }
         if (price == null) {
             throw new GlobalException("商品不存在或未定价");
         }
         ProductPriceVO vo = new ProductPriceVO();
-        vo.setProductCode(dto.getProductCode().trim());
+        vo.setProductCode(code);
         vo.setUnitPrice(price);
         return vo;
+    }
+
+    private BigDecimal lookupVehiclePrice(String code) {
+        for (VehicleEntity vehicle : vehicleMapper.selectAll()) {
+            if (vehicle.getCode() != null
+                    && vehicle.getCode().equalsIgnoreCase(code)
+                    && StringUtils.hasText(vehicle.getPrice())) {
+                return new BigDecimal(vehicle.getPrice().trim());
+            }
+        }
+        return null;
     }
 
     @Override
