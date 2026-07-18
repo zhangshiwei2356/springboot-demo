@@ -1,0 +1,36 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: springboot-demo
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+demo:
+  security:
+    jwt:
+      secret: demo-app-jwt-signing-secret-min-32-bytes-required-for-hs256-xx
+      issuer: demo
+      access-token-ttl-seconds: 7200
+  business:
+    demo:
+      data-dir: ./data/demo
+    archive:
+      upload-dir: ./data/archives
+      max-file-size: 10485760
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+knife4j:
+  enable: true

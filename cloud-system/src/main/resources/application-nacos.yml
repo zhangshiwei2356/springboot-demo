@@ -1,6 +1,0 @@
-# 使用方式：启动 Nacos 后追加 --spring.profiles.active=nacos
-spring:
-  cloud:
-    nacos:
-      discovery:
-        enabled: true
